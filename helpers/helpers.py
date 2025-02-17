@@ -1,5 +1,7 @@
 import re
 
+import pandas as pd
+
 
 def convert_duration_to_minutes(duration):
     if 'h' in duration and 'm' in duration:
@@ -18,23 +20,26 @@ def convert_duration_to_minutes(duration):
         return 0
 
 
-def convert_datetime_to_minutes(date_time_str):
-
-    match = re.match(r'(\d{2}):(\d{2})', date_time_str)
-    if match:
-
-        hour = int(match.group(1))
-        minute = int(match.group(2))
-
-        minutes = hour * 60 + minute
-        return minutes
-    else:
+def convert_datetime_to_minutes(date_time):
+    if isinstance(date_time, pd.Timestamp):
+        return date_time.hour * 60 + date_time.minute
+    elif isinstance(date_time, str):
+        match = re.match(r'(\d{2}):(\d{2})', date_time)
+        if match:
+            return int(match.group(1)) * 60 + int(match.group(2))
         return None
 
 
-def convert_Total_Stops(total):
+def convert_total_stops(total):
     if total == "non-stop":
         return 0
     else:
         sp = total.split()
         return int(sp[0])
+
+
+def convert_to_minutes(time):
+    if isinstance(time, pd.Timestamp):  # Verifica si es un Timestamp
+        time = time.strftime("%H:%M")
+    hours, minutes = map(int, time.split(":"))
+    return minutes + hours * 60
